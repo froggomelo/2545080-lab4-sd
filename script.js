@@ -1,9 +1,9 @@
-// Accessing a button element
+
 const detailsButton = document.querySelector('button');
 const countryName = document.querySelector('input');
 
 detailsButton.addEventListener('click', async function () {
-    const countName = countryName.value.trim(); // Remove leading/trailing spaces
+    const countName = countryName.value.trim();
     if (!countName) {
         alert('Please enter a country name.');
         return;
@@ -18,7 +18,6 @@ detailsButton.addEventListener('click', async function () {
 
 const getInfo = async (countryName) => {
     try {
-        // Make country name case-insensitive by using toLowerCase
         const response = await fetch(`https://restcountries.com/v3.1/name/${countryName.toLowerCase()}`);
         const data = await response.json();
         if (data && data[0]) {
