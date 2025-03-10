@@ -1,50 +1,46 @@
-
+// Accessing a button element
 const detailsButton = document.querySelector('button');
 const countryName = document.querySelector('input');
 
 detailsButton.addEventListener('click', async function () {
-    const countName = countryName.value.trim();
-    if (!countName) {
-        alert('Please enter a country name.');
+    const countName = countryName.value.trim(); // Remove leading/trailing spaces
+
+    if (!isValidCountryName(countName)) {
+        alert('Please enter a valid country name (no numbers, at least two letters).');
         return;
     }
-    const response = await getInfo(countName);
-    if (response) {
-        addInfo(response);
-    } else {
-        alert('Country not found. Please try again.');
-    }
+
+    getInfo(countName).then(response => {
+        if (response) {
+            addInfo(response);
+        } else {
+            alert('Country not found. Please try again.');
+        }
+    });
 });
 
-const getInfo = async (countryName) => {
-    try {
-        const response = await fetch(`https://restcountries.com/v3.1/name/${countryName.toLowerCase()}`);
-        const data = await response.json();
-        if (data && data[0]) {
-            return data[0];
-        } else {
-            return null; // No country found
-        }
-    } catch (error) {
-        console.warn('Error fetching country data:', error);
-        return null; // Return null in case of error
-    }
+// Function to validate country name
+const isValidCountryName = (name) => {
+    return /^[A-Za-z\s]{2,}$/.test(name); // Only letters and spaces, at least 2 characters
 };
 
-const getBorders = async (acronym) => {
-    try {
-        const response = await fetch(`https://restcountries.com/v3.1/alpha/${acronym}`);
-        const data = await response.json();
-        if (data && data[0]) {
-            return data[0];
-        } else {
+const getInfo = (countryName) =>
+    fetch(`https://restcountries.com/v3.1/name/${countryName.toLowerCase()}`)
+        .then(info => info.json())
+        .then(data => data[0] || null) // Return first result or null if not found
+        .catch(error => {
+            console.warn('Error fetching country data:', error);
             return null;
-        }
-    } catch (error) {
-        console.warn('Error fetching border country data:', error);
-        return null;
-    }
-};
+        });
+
+const getBorders = (acronym) =>
+    fetch(`https://restcountries.com/v3.1/alpha/${acronym}`)
+        .then(info => info.json())
+        .then(data => data[0] || null)
+        .catch(error => {
+            console.warn('Error fetching border country data:', error);
+            return null;
+        });
 
 const addInfo = async (results) => {
     const countryInfoSection = document.getElementById('country-info');
@@ -59,7 +55,7 @@ const addInfo = async (results) => {
     }
 
     var capital = document.createElement('p');
-    capital.innerText = "Capital: " + (results.capital ? results.capital[0] : 'N/A'); // Capital is an array
+    capital.innerText = "Capital: " + (results.capital ? results.capital[0] : 'N/A');
     countryInfoSection.appendChild(capital);
 
     var pop = document.createElement('p');
@@ -75,29 +71,19 @@ const addInfo = async (results) => {
     flag.alt = "Flag of " + results.name.common;
     countryInfoSection.appendChild(flag);
 
-    // Handle borders
+    // Handle borders one by one without Promise.all()
     if (results.borders && results.borders.length > 0) {
-        for (var i = 0; i < results.borders.length; i++) {
-            const borderCode = results.borders[i];
-            const borderInfo = await getBorders(borderCode);
+        for (let i = 0; i < results.borders.length; i++) {
+            const borderInfo = await getBorders(results.borders[i]); // Fetch one by one
             if (borderInfo) {
                 var border = document.createElement('p');
                 var borderFlag = document.createElement('img');
                 border.innerText = borderInfo.name.common;
-                if (borderInfo.flags && borderInfo.flags.png) {
-                    borderFlag.src = borderInfo.flags.png;
-                }
+                borderFlag.src = borderInfo.flags.png;
                 borderFlag.alt = "Flag of " + borderInfo.name.common;
-
                 borderInfoSection.appendChild(border);
                 borderInfoSection.appendChild(borderFlag);
-            } else {
-                console.warn(`No data available for border: ${borderCode}`);
             }
         }
-    } else {
-        var noBordersMessage = document.createElement('p');
-        noBordersMessage.innerText = "This country has no bordering countries.";
-        borderInfoSection.appendChild(noBordersMessage);
     }
 };
