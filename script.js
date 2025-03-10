@@ -1,9 +1,8 @@
-// Accessing a button element
 const detailsButton = document.querySelector('button');
 const countryName = document.querySelector('input');
 
 detailsButton.addEventListener('click', async function () {
-    const countName = countryName.value.trim(); // Remove leading/trailing spaces
+    const countName = countryName.value.trim(); 
 
     if (!isValidCountryName(countName)) {
         alert('Please enter a valid country name (no numbers, at least two letters).');
@@ -19,15 +18,14 @@ detailsButton.addEventListener('click', async function () {
     });
 });
 
-// Function to validate country name
 const isValidCountryName = (name) => {
-    return /^[A-Za-z\s]{2,}$/.test(name); // Only letters and spaces, at least 2 characters
+    return /^[A-Za-z\s]{2,}$/.test(name); 
 };
 
 const getInfo = (countryName) =>
     fetch(`https://restcountries.com/v3.1/name/${countryName.toLowerCase()}`)
         .then(info => info.json())
-        .then(data => data[0] || null) // Return first result or null if not found
+        .then(data => data[0] || null) 
         .catch(error => {
             console.warn('Error fetching country data:', error);
             return null;
@@ -44,10 +42,10 @@ const getBorders = (acronym) =>
 
 const addInfo = async (results) => {
     const countryInfoSection = document.getElementById('country-info');
-    countryInfoSection.innerHTML = ""; // Clear previous content
+    countryInfoSection.innerHTML = ""; 
 
     const borderInfoSection = document.getElementById('bordering-countries');
-    borderInfoSection.innerHTML = ""; // Clear previous border info
+    borderInfoSection.innerHTML = ""; 
 
     if (!results) {
         alert('No data available for this country.');
@@ -55,15 +53,15 @@ const addInfo = async (results) => {
     }
 
     var capital = document.createElement('p');
-    capital.innerText = "Capital: " + (results.capital ? results.capital[0] : 'N/A');
+    capital.innerText = "Capital: " + results.capital;
     countryInfoSection.appendChild(capital);
 
     var pop = document.createElement('p');
-    pop.innerText = "Population: " + (results.population || 'N/A');
+    pop.innerText = "Population: " + results.population;
     countryInfoSection.appendChild(pop);
 
     var region = document.createElement('p');
-    region.innerText = "Region: " + (results.region || 'N/A');
+    region.innerText = "Region: " + results.region;
     countryInfoSection.appendChild(region);
 
     var flag = document.createElement('img');
@@ -71,10 +69,13 @@ const addInfo = async (results) => {
     flag.alt = "Flag of " + results.name.common;
     countryInfoSection.appendChild(flag);
 
-    // Handle borders one by one without Promise.all()
+    var borderHeading = document.createElement('p');
+    borderHeading.innerText = "Bordering Countries: ";
+    borderInfoSection.appendChild(borderHeading);
+
     if (results.borders && results.borders.length > 0) {
         for (let i = 0; i < results.borders.length; i++) {
-            const borderInfo = await getBorders(results.borders[i]); // Fetch one by one
+            const borderInfo = await getBorders(results.borders[i]); 
             if (borderInfo) {
                 var border = document.createElement('p');
                 var borderFlag = document.createElement('img');
