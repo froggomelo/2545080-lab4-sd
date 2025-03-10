@@ -1,8 +1,8 @@
-fetch('https://restcountries.com/v3.1/all')
+fetch('https://restcountries.com/v3.1/name/Canada')
 .then(info => info.json())
 .then(r => {
-    addInfo(r);
     console.log(r);
+    addInfo(r);
 })
 .catch(error => console.warn(error));
 
@@ -11,3 +11,4 @@ const addInfo = (results) => {
     capital.innerText = results.capital;
     document.getElementById('country-info').appendChild(capital);
 }
+
