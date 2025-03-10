@@ -1,12 +1,17 @@
 h1 {
-    color: pink
+    color: green
 }
 
 input {
-    color: pink
+    color: black;
+    background-color: green;
 }
 
 p {
-    color: blue 
+    color: black 
 
+}
+
+button {
+    color: green
 }
